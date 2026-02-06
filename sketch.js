@@ -1,133 +1,88 @@
 /*
-Week 4 — Example 4: Playable Maze (JSON + Level class + Player class)
+Week 4 — Example 5: Example 5: Blob Platformer (JSON + Classes)
 Course: GBDA302
 Instructors: Dr. Karen Cochrane and David Han
 Date: Feb. 5, 2026
 
-This is the "orchestrator" file:
-- Loads JSON levels (preload)
-- Builds Level objects
-- Creates/positions the Player
-- Handles input + level switching
+This file orchestrates everything:
+- load JSON in preload()
+- create WorldLevel from JSON
+- create BlobPlayer
+- update + draw each frame
+- handle input events (jump, optional next level)
 
-It is intentionally light on "details" because those are moved into:
-- Level.js (grid + drawing + tile meaning)
-- Player.js (position + movement rules)
-
-Based on the playable maze structure from Example 3
+This matches the structure of the original blob sketch from Week 2 but moves
+details into classes.
 */
 
-const TS = 32;
+let data; // raw JSON data
+let levelIndex = 0;
 
-// Raw JSON data (from levels.json).
-let levelsData;
-
-// Array of Level instances.
-let levels = [];
-
-// Current level index.
-let li = 0;
-
-// Player instance (tile-based).
-let player;
+let world; // WorldLevel instance (current level)
+let player; // BlobPlayer instance
 
 function preload() {
-  // Ensure level data is ready before setup runs.
-  levelsData = loadJSON("levels.json");
+  // Load the level data from disk before setup runs.
+  data = loadJSON("levels.json");
 }
 
 function setup() {
-  /*
-  Convert raw JSON grids into Level objects.
-  levelsData.levels is an array of 2D arrays. 
-  */
-  levels = levelsData.levels.map((grid) => new Level(copyGrid(grid), TS));
+  // Create the player once (it will be respawned per level).
+  player = new BlobPlayer();
 
-  // Create a player.
-  player = new Player(TS);
-
-  // Load the first level (sets player start + canvas size).
+  // Load the first level.
   loadLevel(0);
 
+  // Simple shared style setup.
   noStroke();
   textFont("sans-serif");
   textSize(14);
 }
 
 function draw() {
-  background(240);
+  // 1) Draw the world (background + platforms)
+  world.drawWorld();
 
-  // Draw current level then player on top.
-  levels[li].draw();
-  player.draw();
+  // 2) Update and draw the player on top of the world
+  player.update(world.platforms);
+  player.draw(world.theme.blob);
 
-  drawHUD();
-}
-
-function drawHUD() {
-  // HUD matches your original idea: show level count and controls.
+  // 3) HUD
   fill(0);
-  text(`Level ${li + 1}/${levels.length} — WASD/Arrows to move`, 10, 16);
+  text(world.name, 10, 18);
+  text("Move: A/D or ←/→ • Jump: Space/W/↑ • Next: N", 10, 36);
 }
 
 function keyPressed() {
-  /*
-  Convert key presses into a movement direction. (WASD + arrows)
-  */
-  let dr = 0;
-  let dc = 0;
+  // Jump keys
+  if (key === " " || key === "W" || key === "w" || keyCode === UP_ARROW) {
+    player.jump();
+  }
 
-  if (keyCode === LEFT_ARROW || key === "a" || key === "A") dc = -1;
-  else if (keyCode === RIGHT_ARROW || key === "d" || key === "D") dc = 1;
-  else if (keyCode === UP_ARROW || key === "w" || key === "W") dr = -1;
-  else if (keyCode === DOWN_ARROW || key === "s" || key === "S") dr = 1;
-  else return; // not a movement key
-
-  // Try to move. If blocked, nothing happens.
-  const moved = player.tryMove(levels[li], dr, dc);
-
-  // If the player moved onto a goal tile, advance levels.
-  if (moved && levels[li].isGoal(player.r, player.c)) {
-    nextLevel();
+  // Optional: cycle levels with N (as with the earlier examples)
+  if (key === "n" || key === "N") {
+    const next = (levelIndex + 1) % data.levels.length;
+    loadLevel(next);
   }
 }
 
-// ----- Level switching -----
+/*
+Load a level by index:
+- create a WorldLevel instance from JSON
+- resize canvas based on inferred geometry
+- spawn player using level start + physics
+*/
+function loadLevel(i) {
+  levelIndex = i;
 
-function loadLevel(idx) {
-  li = idx;
+  // Create the world object from the JSON level object.
+  world = new WorldLevel(data.levels[levelIndex]);
 
-  const level = levels[li];
+  // Fit canvas to world geometry (or defaults if needed).
+  const W = world.inferWidth(640);
+  const H = world.inferHeight(360);
+  resizeCanvas(W, H);
 
-  // Place player at the level's start tile (2), if present.
-  if (level.start) {
-    player.setCell(level.start.r, level.start.c);
-  } else {
-    // Fallback spawn: top-left-ish (but inside bounds).
-    player.setCell(1, 1);
-  }
-
-  // Ensure the canvas matches this level’s dimensions.
-  resizeCanvas(level.pixelWidth(), level.pixelHeight());
-}
-
-function nextLevel() {
-  // Wrap around when we reach the last level.
-  const next = (li + 1) % levels.length;
-  loadLevel(next);
-}
-
-// ----- Utility -----
-
-function copyGrid(grid) {
-  /*
-  Make a deep-ish copy of a 2D array:
-  - new outer array
-  - each row becomes a new array
-
-  Why copy?
-  - Because Level constructor may normalize tiles (e.g., replace 2 with 0)
-  - And we don’t want to accidentally mutate the raw JSON data object. 
-  */
-  return grid.map((row) => row.slice());
+  // Apply level settings + respawn.
+  player.spawnFromLevel(world);
 }

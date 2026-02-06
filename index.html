@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Example 4 — Playable Maze (JSON + Classes)</title>
+    <title>Example 5 — Blob Platformer (JSON + Classes)</title>
     <link rel="stylesheet" href="style.css" />
   </head>
 
@@ -11,11 +11,12 @@
     <!-- Load p5 first -->
     <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
 
-    <!-- Load your classes BEFORE sketch.js so they exist when sketch runs -->
-    <script src="Level.js"></script>
-    <script src="Player.js"></script>
+    <!-- Load classes BEFORE sketch.js (order matters) -->
+    <script src="platform.js"></script>
+    <script src="worldLevel.js"></script>
+    <script src="blobPlayer.js"></script>
 
-    <!-- Then load the main sketch (preload/setup/draw) -->
+    <!-- Main sketch -->
     <script src="sketch.js"></script>
   </body>
 </html>
