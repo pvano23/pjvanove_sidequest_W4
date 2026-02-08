@@ -11,16 +11,12 @@ This blob game is changed get your mind thinking in a strategic way. Your charac
 
 ## Interaction Instructions
 
-**Controls:**
-- **Move Left/Right:** A/D or Left/Right Arrow Keys
-- **Jump:** Spacebar, W, or Up Arrow Key
+User can move the block left/right using A/D or left/right arrows. user can jump using Spacebar, W or up arrow. Some important notes to remember blob starts with three lives per level (visual indivator are the tally hearts at the bottom left)
 
-**Gameplay:**
-- Start with 3 lives per level (shown as hearts at the bottom left)
-- **Level 1 - Intro Steps:** Avoid rolling cacti obstacles (🌵) while jumping across platforms. Reach the black wall at the top right to advance to Level 2.
-- **Level 2 - Sky Climb:** Navigate across platforms before the 10-second timer runs out. Each time the timer expires, you lose a life and respawn. Reach the top right black wall to complete the game.
-- The game loops back to Level 1 after completing Level 2, allowing endless replayability.
-- Game Over occurs when you lose all 3 lives on a level. 
+In Level 1 try to avoid the rolling cacti obstacles while jumping acorss platforms. To get to the next level have the blob reach the black wall at the top right. 
+
+In Level 2 get through the platforms under 10-seconds or lose a life once the timer hits zero. reach the top right black wall to complete the game and loop back to level 1.
+
 
 ---
 
