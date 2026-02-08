@@ -30,7 +30,7 @@ N/A
 
 The code was written by Dr. Karen Cochrane and David Han but they used GenAI to write the comments.
 
-There was code added by Paige Van Overberghe and say what GenAI added complex code with comments.
+There was code added by Paige Van Overberghe and GenAI added complex code with comments.
 
 
 
